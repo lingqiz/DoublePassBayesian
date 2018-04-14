@@ -1,5 +1,6 @@
 # Use package rmutil/pracma for two-dimensional numerical integration
 # Use package mvtnorm for two-dimensional Gaussian Distribution
+
 install.packages('rmutil')
 install.packages('pracma')
 install.packages('mvtnorm')

@@ -1,5 +1,6 @@
 # Use package rmutil/pracma for two-dimensional numerical integration
 # Use package mvtnorm for two-dimensional Gaussian Distribution
+
 install.packages('rmutil')
 install.packages('pracma')
 install.packages('mvtnorm')
@@ -54,6 +55,7 @@ paraMode.ill   <- mlEstimator(expData.ill)$par
 
 # Full Model of the Data 
 # P(res | mu, sigma) p(sigma | mu0) p(mu0) p(mu)
+# Hyper-parameter
 nDataPoint <- 4
 sigmaN <- 0.1
 
@@ -196,11 +198,10 @@ gibbsSampler <- function(dataMatrix, nSample, mu0Init)
 }
 
 # Gibbs Sampler for Hierarhical Model
-postHierarchical <- gibbsSampler(dataMatrix, nSample, mu0Init = 0.2)
-mu0Sample <- postHierarchical$mu0Sample
+posteriorHierarchical <- gibbsSampler(dataMatrix, nSample, mu0Init = 0.2)
+mu0Sample <- posteriorHierarchical$mu0Sample
 
 par(mfrow = c(1, 2))
-# Convergence
+# Convergence & Auto-correlation Scale
 plot(1 : 2e2, mu0Sample[1:2e2], type = 'l')
-# Auto-correlation Scale
 acf(mu0Sample)
