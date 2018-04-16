@@ -331,11 +331,9 @@ for(condJ in 1:sub1.data$nCond)
 par(mfrow = c(1, 2))
 plot(sub1.data$chPercent, muEst, 'b', xlim = c(0, 1), ylim = c(-1.5, 2), xlab = 'percent chosen', ylab = 'mu')
 arrows(sub1.data$chPercent, muInterval[1, ], sub1.data$chPercent, muInterval[2, ], angle = 90, code = 3, length = 0.05)
-title(main= "d' estimate")
 
 plot(sub1.data$chPercent, rhoEst, 'b', xlim = c(0, 1), ylim = c(-0.4, 1), xlab = 'percent chosen', ylab = 'rho')
 arrows(sub1.data$chPercent, rhoInterval[1, ], sub1.data$chPercent, rhoInterval[2, ], angle = 90, code = 3, length = 0.05)
-title(main= "rho estimate")
 
 
 ### Hierarhical Model, pull data from all conditions together ###
@@ -497,7 +495,85 @@ par(mfrow = c(1, 2))
 plot(1 : 2e2, mu0Sample[1:2e2], type = 'l')
 acf(mu0Sample)
 
-par(mfrow = c(1, 1))
-h1 <- hist(mu0Sample,    seq(-1, 1, 0.05), freq = FALSE, xlab = 'rho0',  ylab = 'density', main = '')
+# Compare the posterior distribution
+par(mfrow = c(1, 2))
+h1 <- hist(mu0SampleFull, seq(-0.3, 1, 0.05), freq = FALSE, xlab = 'rho0',  ylab = 'density', main = '')
+lines(density(mu0SampleFull)) # Kernel Density Estimation
+title('posterior, rho0 | R')
+
+h1 <- hist(mu0Sample, seq(-0.3, 1, 0.05), freq = FALSE, xlab = 'rho0',  ylab = 'density', main = '')
 lines(density(mu0Sample)) # Kernel Density Estimation
-title('posterior, rho0')
+title('posterior, rho0 | R, sigma0_hat')
+
+### Compare posterior ###
+# Estimates of mu and rho, full Bayesian
+muEstFull  <- array(0, sub1.data$nCond)
+rhoEstFull <- array(0, sub1.data$nCond)
+muIntervalFull  <- matrix(0, nrow = 2, ncol = sub1.data$nCond)
+rhoIntervalFull <- matrix(0, nrow = 2, ncol = sub1.data$nCond)
+
+# Index for 95% Confidence Interval
+idxLI <- nSample * 0.025
+idxUI <- nSample * 0.975
+for(condJ in 1:sub1.data$nCond)
+{
+  muSample  <- sort(fullPost$muSample[condJ, ])
+  rhoSample <- sort(fullPost$rhoSample[condJ, ])
+  
+  muEstFull[condJ]  <- mean(muSample)
+  rhoEstFull[condJ] <- mean(rhoSample)
+  
+  muIntervalFull[, condJ]  <- c(muSample[idxLI], muSample[idxUI])
+  rhoIntervalFull[, condJ] <- c(rhoSample[idxLI], rhoSample[idxUI])
+}
+
+par(mfrow = c(1, 2))
+plot(sub1.data$chPercent, muEstFull, 'b', xlim = c(0, 1), ylim = c(-1.5, 2), xlab = 'percent chosen', ylab = 'mu')
+arrows(sub1.data$chPercent, muIntervalFull[1, ], sub1.data$chPercent, muIntervalFull[2, ], angle = 90, code = 3, length = 0.05)
+
+plot(sub1.data$chPercent, rhoEstFull, 'b', xlim = c(0, 1), ylim = c(-0.4, 1), xlab = 'percent chosen', ylab = 'rho')
+arrows(sub1.data$chPercent, rhoIntervalFull[1, ], sub1.data$chPercent, rhoIntervalFull[2, ], angle = 90, code = 3, length = 0.05)
+
+
+# Estimates of mu and rho variable, Fixed Variance
+muEstHircal  <- array(0, sub1.data$nCond)
+rhoEstHircal <- array(0, sub1.data$nCond)
+muIntervalHircal  <- matrix(0, nrow = 2, ncol = sub1.data$nCond)
+rhoIntervalHircal <- matrix(0, nrow = 2, ncol = sub1.data$nCond)
+
+# Index for 95% Confidence Interval
+idxLI <- nSample * 0.025
+idxUI <- nSample * 0.975
+for(condJ in 1:sub1.data$nCond)
+{
+  muSample  <- sort(posteriorHierarchical$muSample[condJ, ])
+  rhoSample <- sort(posteriorHierarchical$rhoSample[condJ, ])
+  
+  muEstHircal[condJ]  <- mean(muSample)
+  rhoEstHircal[condJ] <- mean(rhoSample)
+  
+  muIntervalHircal[, condJ]  <- c(muSample[idxLI], muSample[idxUI])
+  rhoIntervalHircal[, condJ] <- c(rhoSample[idxLI], rhoSample[idxUI])
+}
+
+par(mfrow = c(1, 2))
+plot(sub1.data$chPercent, muEstHircal, 'b', xlim = c(0, 1), ylim = c(-1.5, 2), xlab = 'percent chosen', ylab = 'mu', col = 'red')
+arrows(sub1.data$chPercent, muIntervalHircal[1, ], sub1.data$chPercent, muIntervalHircal[2, ], angle = 90, code = 3, length = 0.05, col = 'red')
+
+plot(sub1.data$chPercent, rhoEstHircal, 'b', xlim = c(0, 1), ylim = c(-0.4, 1), xlab = 'percent chosen', ylab = 'rho', col = 'red')
+arrows(sub1.data$chPercent, rhoIntervalHircal[1, ], sub1.data$chPercent, rhoIntervalHircal[2, ], angle = 90, code = 3, length = 0.05, col = 'red')
+
+
+### Plot Figures together ###
+par(mfrow = c(1, 2))
+plot(sub1.data$chPercent, muEstFull, 'b', xlim = c(0, 1), ylim = c(-1.5, 2), xlab = 'percent chosen', ylab = 'mu')
+arrows(sub1.data$chPercent, muIntervalFull[1, ], sub1.data$chPercent, muIntervalFull[2, ], angle = 90, code = 3, length = 0.05)
+
+lines(sub1.data$chPercent, muEstHircal, 'b', col = 'red')
+arrows(sub1.data$chPercent, muIntervalHircal[1, ], sub1.data$chPercent, muIntervalHircal[2, ], angle = 90, code = 3, length = 0.05, col = 'red')
+
+plot(sub1.data$chPercent, rhoEstFull, 'b', xlim = c(0, 1), ylim = c(-0.4, 1), xlab = 'percent chosen', ylab = 'rho')
+arrows(sub1.data$chPercent, rhoIntervalFull[1, ], sub1.data$chPercent, rhoIntervalFull[2, ], angle = 90, code = 3, length = 0.05)
+
+lines(sub1.data$chPercent, rhoEstHircal, 'b', col = 'red')
+arrows(sub1.data$chPercent, rhoIntervalHircal[1, ], sub1.data$chPercent, rhoIntervalHircal[2, ], angle = 90, code = 3, length = 0.05, col = 'red')
