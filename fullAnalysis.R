@@ -344,7 +344,7 @@ title(main= "rho estimate")
 # P(res | mu, sigma) p(sigma | mu0) p(mu0) p(mu)
 # Hyper-parameter
 nDataPoint <- sub1.data$nCond
-sigmaN     <- 0.1 # Hyperparameter, control the degree of shrinkage
+sigmaN     <- 0.33 # Hyperparameter, control the degree of shrinkage
 
 # Cond Posterior
 # P(mu, sigma | res, mu0)
@@ -484,7 +484,7 @@ gibbsSampler <- function(dataMatrix, nSample, mu0Init)
 }
 
 # Gibbs Sampler for Hierarhical Model
-nSample <- 5e3
+nSample <- 2e3
 posteriorHierarchical <- gibbsSampler(sub1.data$dataMatrix, nSample, mu0Init = 0.2)
 mu0Sample <- posteriorHierarchical$mu0Sample
 
