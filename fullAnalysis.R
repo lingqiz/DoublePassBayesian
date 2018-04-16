@@ -488,7 +488,16 @@ nSample <- 2e3
 posteriorHierarchical <- gibbsSampler(sub1.data$dataMatrix, nSample, mu0Init = 0.2)
 mu0Sample <- posteriorHierarchical$mu0Sample
 
+# Index for 95% Confidence Interval
+idxLI <- nSample * 0.025
+idxUI <- nSample * 0.975
+
 par(mfrow = c(1, 2))
 # Convergence & Auto-correlation Scale
 plot(1 : 2e2, mu0Sample[1:2e2], type = 'l')
 acf(mu0Sample)
+
+par(mfrow = c(1, 1))
+h1 <- hist(mu0Sample,    seq(-1, 1, 0.05), freq = FALSE, xlab = 'rho0',  ylab = 'density', main = '')
+lines(density(mu0Sample)) # Kernel Density Estimation
+title('posterior, rho0')
